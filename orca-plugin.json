@@ -1,0 +1,138 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stablyai/orca/main/docs/schemas/plugins/orca-plugin.v2.schema.json",
+  "manifestVersion": 2,
+  "execution": "trusted-worker",
+  "id": "rojo-studio",
+  "name": "Rojo Studio",
+  "version": "0.1.0",
+  "description": "Rojo for Roblox in Orca: install Rojo, start and stop rojo serve with live logs and a connected-Studio indicator, build .rbxl/.rbxm files, generate sourcemaps for luau-lsp, create projects and see the instance tree your project file maps. Unofficial; not affiliated with Rojo or Roblox.",
+  "license": "MIT",
+  "icon": "assets/icon.png",
+  "engines": {
+    "orca": ">=1.4.260"
+  },
+  "pluginApi": 1,
+  "main": "src/worker.ts",
+  "contributes": {
+    "panels": [
+      {
+        "id": "rojo",
+        "title": "Rojo Studio",
+        "icon": "rocket",
+        "entry": "src/panel.html",
+        "ui": "html"
+      }
+    ],
+    "commands": [
+      {
+        "id": "rojo-studio.panel",
+        "title": "Rojo: Show or hide the panel (right sidebar)",
+        "action": "sidebar.right.toggle"
+      },
+      {
+        "id": "rojo-studio.serve.toggle",
+        "title": "Rojo: Start or stop the server for this workspace",
+        "when": "workspace"
+      },
+      {
+        "id": "rojo-studio.serve.stopAll",
+        "title": "Rojo: Stop all servers and watchers"
+      },
+      {
+        "id": "rojo-studio.build",
+        "title": "Rojo: Build the selected project",
+        "when": "workspace"
+      },
+      {
+        "id": "rojo-studio.sourcemap",
+        "title": "Rojo: Generate sourcemap.json",
+        "when": "workspace"
+      }
+    ],
+    "statusBarItems": [
+      {
+        "id": "rojo",
+        "icon": "rocket",
+        "text": "Rojo",
+        "tooltip": "Rojo Studio: show or hide the panel",
+        "command": "rojo-studio.panel"
+      }
+    ],
+    "events": [
+      { "on": "workspace.changed" }
+    ],
+    "settings": [
+      {
+        "key": "defaultHost",
+        "title": "Default server address",
+        "description": "Where new servers listen. \"This computer only\" binds 127.0.0.1. \"All network interfaces\" binds 0.0.0.0, so Roblox Studio in a virtual machine or on another computer can connect; anyone on your network can then read your project.",
+        "type": "string",
+        "default": "localhost",
+        "enum": ["localhost", "0.0.0.0"],
+        "enumLabels": ["This computer only (localhost)", "All network interfaces (0.0.0.0)"]
+      },
+      {
+        "key": "defaultPort",
+        "title": "Default port",
+        "description": "Used when the project file has no servePort. Rojo's own default is 34872.",
+        "type": "integer",
+        "default": 34872,
+        "minimum": 1,
+        "maximum": 65535
+      },
+      {
+        "key": "runIn",
+        "title": "Run Rojo in",
+        "description": "Automatic runs Rojo as a background process for workspaces on this computer and in an Orca terminal for remote (SSH) workspaces, using the rojo on that host.",
+        "type": "string",
+        "default": "auto",
+        "enum": ["auto", "process", "terminal"],
+        "enumLabels": ["Automatic", "Background process", "Orca terminal"]
+      },
+      {
+        "key": "rojoPath",
+        "title": "Path to rojo",
+        "description": "Leave empty to pick Rojo automatically (a tool-manager pin in the project, then PATH, then a version this plugin installed). Otherwise the absolute path of a rojo executable.",
+        "type": "string",
+        "default": "",
+        "maxLength": 1024,
+        "placeholder": "/usr/local/bin/rojo"
+      },
+      {
+        "key": "sourcemapWithServe",
+        "title": "Watch sourcemap.json while serving",
+        "description": "Also runs rojo sourcemap --watch when a server starts, for luau-lsp.",
+        "type": "boolean",
+        "default": false
+      },
+      {
+        "key": "notifyOnError",
+        "title": "Notify when a server or watcher fails",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "key": "checkForUpdates",
+        "title": "Check GitHub for new Rojo releases",
+        "description": "At most once an hour, from api.github.com. Nothing about you is sent.",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "key": "includePrereleases",
+        "title": "Offer Rojo prereleases",
+        "type": "boolean",
+        "default": false
+      }
+    ]
+  },
+  "capabilities": [
+    { "kind": "workspace:read" },
+    { "kind": "workspace:write" },
+    { "kind": "terminal:send" },
+    { "kind": "terminal:read" },
+    { "kind": "storage:own" },
+    { "kind": "settings:own" },
+    { "kind": "notifications:show" }
+  ]
+}
